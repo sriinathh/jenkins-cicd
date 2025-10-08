@@ -11,16 +11,12 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ec2-deploy-key']) {
-                    // Remove old temp folder and create new one
-                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@15.206.128.8 "rm -rf /tmp/test_dir && mkdir -p /tmp/test_dir"'
-
-                    // Copy all files from Jenkins workspace to EC2 temp folder
-                    sh 'scp -o StrictHostKeyChecking=no -r ${WORKSPACE}/* ec2-user@15.206.128.8:/tmp/test_dir/'
-
-                    // Move files from temp folder to Nginx webroot
-                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@15.206.128.8 "sudo rsync -a /tmp/test_dir/ /usr/share/nginx/html/ && sudo rm -rf /tmp/test_dir"'
-                }
+                // Use your private key directly instead of ssh-agent
+                bat '''
+                ssh -i C:\\Users\\srinath\\.ssh\\jenkins_deploy -o StrictHostKeyChecking=no ec2-user@15.206.128.8 "rm -rf /tmp/test_dir && mkdir -p /tmp/test_dir"
+                scp -i C:\\Users\\srinath\\.ssh\\jenkins_deploy -o StrictHostKeyChecking=no -r "%WORKSPACE%\\*" ec2-user@15.206.128.8:/tmp/test_dir/
+                ssh -i C:\\Users\\srinath\\.ssh\\jenkins_deploy -o StrictHostKeyChecking=no ec2-user@15.206.128.8 "sudo rsync -a /tmp/test_dir/ /usr/share/nginx/html/ && sudo rm -rf /tmp/test_dir"
+                '''
             }
         }
     }
