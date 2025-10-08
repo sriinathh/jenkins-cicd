@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Pull from GitHub without changelog (to avoid Git whatchanged issue on Windows)
+                // Pull from GitHub without changelog
                 git branch: 'main', url: 'https://github.com/sriinathh/jenkins-cicd.git', changelog: false, poll: false
             }
         }
